@@ -23,8 +23,49 @@ class CursoDao
             $inserir->bindValue(":nome",$curso->getNome());
             $inserir->bindValue(":valor",$curso->getValor());
             $inserir->execute();
+            return true;
+
         }catch (\PDOException $e){
-            echo "<h1>Aconteceu um erro: {$e->getMessage()}</h1>";
+            echo $e->getMessage();
+            return false;
         }
     }
+
+    public function pesquisa1($curso){
+        $sql = "select * from cursos where nome like :nome";
+        try{
+            $pesquisa = $this->conexao->prepare($sql);
+            $pesquisa->bindValue(":nome","%".$curso->getNome()."%");
+            $pesquisa->execute();
+            $resultado = $pesquisa->fetchAll();
+            $cursos = [];
+            foreach ($resultado as $item){
+                $c = new \App\Model\Curso();
+                $c->setId($item['id']);
+                $c->setNome($item['nome']);
+                $c->setValor($item['valor']);
+                $cursos[] = $c;
+            }
+            return $cursos;
+        }catch (\PDOException $e){
+            echo $e->getMessage();
+        }
+    }
+
+    public function pesquisa2($curso)
+    {
+        $sql = "select * from cursos where nome like :nome";
+        try {
+            $pesquisa = $this->conexao->prepare($sql);
+            $pesquisa->bindValue(":nome", "%".$curso->getNome()."%");
+            $pesquisa->execute();
+            $lista = $pesquisa->fetchAll(\PDO::FETCH_ASSOC);
+
+                return $lista;
+
+        } catch (\PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
+
 }
